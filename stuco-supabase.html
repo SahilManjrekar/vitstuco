@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Council Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-badge {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .user-badge.management {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .nav-tab {
+            background: transparent;
+            border: 2px solid #667eea;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            color: #667eea;
+        }
+
+        .nav-tab:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border-color: transparent;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+        }
+
+        .btn-success {
+            background: #28a745;
+        }
+
+        .btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            min-height: 500px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+        }
+
+        .event-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .event-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .event-poster {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            cursor: pointer;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-size: 28px;
+            cursor: pointer;
+            color: #aaa;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .error-message {
+            color: #dc3545;
+            background: #f8d7da;
+            padding: 10px;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+
+        .success-message {
+            color: #28a745;
+            background: #d4edda;
+            padding: 10px;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="nav-bar">
+                <div class="logo">🎓 Student Council Portal</div>
+                <div class="user-info" id="userInfo">
+                    <button class="btn" onclick="showLogin()">Login</button>
+                </div>
+            </div>
+            <div class="nav-tabs" id="navTabs">
+                <button class="nav-tab active" onclick="showTab('home')">Home</button>
+                <button class="nav-tab" onclick="showTab('events')">Events</button>
+                <button class="nav-tab" id="enrolledTab" style="display: none;" onclick="showTab('enrolled')">My Events</button>
+                <button class="nav-tab" onclick="showTab('gallery')">Gallery</button>
+                <button class="nav-tab" onclick="showTab('feedback')">Feedback</button>
+                <button class="nav-tab" id="dashboardTab" style="display: none;" onclick="showTab('dashboard')">Dashboard</button>
+            </div>
+        </div>
+
+        <div class="content" id="content">
+            <div id="home" class="tab-content">
+                <h1 style="text-align: center; color: #667eea; margin-bottom: 20px;">Welcome to Student Council</h1>
+                <p style="text-align: center; color: #666; margin-bottom: 40px;">Your gateway to campus events and activities</p>
+            </div>
+
+            <div id="events" class="tab-content hidden">
+                <h2 style="margin-bottom: 20px;">Campus Events</h2>
+                <div id="eventsList">
+                    <div class="loading">Loading events...</div>
+                </div>
+            </div>
+
+            <div id="enrolled" class="tab-content hidden">
+                <h2 style="margin-bottom: 20px;">My Enrolled Events</h2>
+                <div id="enrolledEventsList">
+                    <div class="loading">Loading your events...</div>
+                </div>
+            </div>
+
+            <div id="gallery" class="tab-content hidden">
+                <h2 style="margin-bottom: 20px;">Photo Gallery</h2>
+                <div id="galleryList">
+                    <div class="loading">Loading gallery...</div>
+                </div>
+            </div>
+
+            <div id="feedback" class="tab-content hidden">
+                <h2 style="margin-bottom: 20px;">Feedback</h2>
+                <div class="form-group">
+                    <label for="feedbackText">Share your feedback:</label>
+                    <textarea id="feedbackText" rows="4" placeholder="Your thoughts..."></textarea>
+                </div>
+                <button class="btn" onclick="submitFeedback()">Submit Feedback</button>
+                <div id="feedbackList" style="margin-top: 30px;">
+                    <div class="loading">Loading feedback...</div>
+                </div>
+            </div>
+
+            <div id="dashboard" class="tab-content hidden">
+                <h2 style="margin-bottom: 20px;">Management Dashboard</h2>
+                <button class="btn" onclick="showAddEventModal()">Add Event</button>
+                <div id="dashboardContent">
+                    <div class="loading">Loading dashboard...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="hideModal('loginModal')">&times;</span>
+            <h2 style="margin-bottom: 20px; text-align: center;">Login</h2>
+            <div id="loginError"></div>
+            <div class="form-group">
+                <label for="loginEmail">Email:</label>
+                <input type="email" id="loginEmail" placeholder="Enter your email">
+            </div>
+            <div class="form-group">
+                <label for="loginPassword">Password:</label>
+                <input type="password" id="loginPassword" placeholder="Enter your password">
+            </div>
+            <button class="btn" onclick="login()">Login</button>
+            <p style="text-align: center; margin-top: 15px;">
+                Don't have an account? <a href="#" onclick="showSignup()">Sign up</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Signup Modal -->
+    <div id="signupModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="hideModal('signupModal')">&times;</span>
+            <h2 style="margin-bottom: 20px; text-align: center;">Sign Up</h2>
+            <div id="signupError"></div>
+            <div class="form-group">
+                <label for="signupUsername">Username:</label>
+                <input type="text" id="signupUsername" placeholder="Choose a username">
+            </div>
+            <div class="form-group">
+                <label for="signupEmail">Email:</label>
+                <input type="email" id="signupEmail" placeholder="Enter your email">
+            </div>
+            <div class="form-group">
+                <label for="signupPassword">Password:</label>
+                <input type="password" id="signupPassword" placeholder="Choose a password (min 6 characters)">
+            </div>
+            <div class="form-group">
+                <label for="signupUserType">Account Type:</label>
+                <select id="signupUserType">
+                    <option value="student">Student</option>
+                    <option value="secretary">Secretary</option>
+                    <option value="management">Management</option>
+                </select>
+            </div>
+            <button class="btn" onclick="signup()">Sign Up</button>
+            <p style="text-align: center; margin-top: 15px;">
+                Already have an account? <a href="#" onclick="showLogin()">Login</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Add Event Modal -->
+    <div id="addEventModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="hideModal('addEventModal')">&times;</span>
+            <h2 style="margin-bottom: 20px; text-align: center;">Add New Event</h2>
+            <div id="addEventError"></div>
+            <div class="form-group">
+                <label for="eventTitle">Title:</label>
+                <input type="text" id="eventTitle">
+            </div>
+            <div class="form-group">
+                <label for="eventDate">Date:</label>
+                <input type="date" id="eventDate">
+            </div>
+            <div class="form-group">
+                <label for="eventDescription">Description:</label>
+                <textarea id="eventDescription" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="eventLocation">Location:</label>
+                <input type="text" id="eventLocation">
+            </div>
+            <div class="form-group">
+                <label for="eventMaxParticipants">Max Participants:</label>
+                <input type="number" id="eventMaxParticipants" value="100">
+            </div>
+            <div class="form-group">
+                <label for="eventFee">Fee (₹):</label>
+                <input type="number" id="eventFee" value="0">
+            </div>
+            <div class="form-group">
+                <label for="eventPoster">Poster:</label>
+                <input type="file" id="eventPoster" accept="image/*">
+            </div>
+            <button class="btn" onclick="addEvent()">Add Event</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script>
+        // CONFIGURATION - Replace with your Supabase credentials
+        const SUPABASE_URL = 'https://kaofemvdmyyagujwjhxg.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imthb2ZlbXZkbXl5YWd1andqaHhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyNjA3NDEsImV4cCI6MjA3NDgzNjc0MX0.ejt-s-iwu30z-1TiW3QpQnAIfmPsN0axYwcTD4dalUs';
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        let currentUser = null;
+        let currentUserProfile = null;
+
+        // Initialize
+        async function init() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+                await loadUserProfile(session.user.id);
+            }
+            loadEvents();
+            loadGallery();
+            loadFeedback();
+        }
+
+        // Authentication
+        async function login() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const errorDiv = document.getElementById('loginError');
+
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email,
+                    password
+                });
+
+                if (error) throw error;
+
+                await loadUserProfile(data.user.id);
+                hideModal('loginModal');
+                showSuccess('Login successful!');
+            } catch (error) {
+                errorDiv.innerHTML = `<div class="error-message">${error.message}</div>`;
+            }
+        }
+
+        async function signup() {
+            const username = document.getElementById('signupUsername').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            const userType = document.getElementById('signupUserType').value;
+            const errorDiv = document.getElementById('signupError');
+
+            try {
+                const { data, error } = await supabase.auth.signUp({
+                    email,
+                    password
+                });
+
+                if (error) throw error;
+
+                await supabase.from('profiles').insert([{
+                    id: data.user.id,
+                    username,
+                    email,
+                    user_type: userType
+                }]);
+
+                hideModal('signupModal');
+                showSuccess('Account created! Please login.');
+                showLogin();
+            } catch (error) {
+                errorDiv.innerHTML = `<div class="error-message">${error.message}</div>`;
+            }
+        }
+
+        async function logout() {
+            await supabase.auth.signOut();
+            currentUser = null;
+            currentUserProfile = null;
+            updateUI();
+            showTab('home');
+        }
+
+        async function loadUserProfile(userId) {
+            const { data, error } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', userId)
+                .single();
+
+            if (data) {
+                currentUserProfile = data;
+                currentUser = data.username;
+                updateUI();
+            }
+        }
+
+        function updateUI() {
+            const userInfo = document.getElementById('userInfo');
+            if (currentUserProfile) {
+                const badgeClass = currentUserProfile.user_type === 'management' ? 'user-badge management' : 'user-badge';
+                userInfo.innerHTML = `
+                    <div class="${badgeClass}">${currentUserProfile.user_type}: ${currentUserProfile.username}</div>
+                    <button class="btn btn-secondary" onclick="logout()">Logout</button>
+                `;
+
+                if (currentUserProfile.user_type === 'student') {
+                    document.getElementById('enrolledTab').style.display = 'inline-block';
+                }
+                if (currentUserProfile.user_type === 'management' || currentUserProfile.user_type === 'secretary') {
+                    document.getElementById('dashboardTab').style.display = 'inline-block';
+                }
+            } else {
+                userInfo.innerHTML = '<button class="btn" onclick="showLogin()">Login</button>';
+                document.getElementById('enrolledTab').style.display = 'none';
+                document.getElementById('dashboardTab').style.display = 'none';
+            }
+        }
+
+        // Events
+        async function loadEvents() {
+            const { data: events, error } = await supabase
+                .from('events')
+                .select(`
+                    *,
+                    enrollments (
+                        id,
+                        user_id,
+                        payment_status,
+                        profiles (username)
+                    )
+                `)
+                .order('date', { ascending: true });
+
+            if (error) {
+                console.error('Error loading events:', error);
+                return;
+            }
+
+            const eventsList = document.getElementById('eventsList');
+            if (events.length === 0) {
+                eventsList.innerHTML = '<p style="text-align: center; color: #666;">No events available.</p>';
+                return;
+            }
+
+            eventsList.innerHTML = events.map(event => {
+                const enrolledCount = event.enrollments?.length || 0;
+                const isEnrolled = currentUserProfile && event.enrollments?.some(e => e.user_id === currentUserProfile.id);
+                const canEnroll = currentUserProfile?.user_type === 'student' && !isEnrolled && enrolledCount < event.max_participants;
+
+                return `
+                    <div class="event-card">
+                        ${event.poster_url ? `<img src="${event.poster_url}" class="event-poster" alt="${event.title}">` : ''}
+                        <h3>${event.title}</h3>
+                        <p><strong>Date:</strong> ${new Date(event.date).toLocaleDateString()}</p>
+                        <p><strong>Location:</strong> ${event.location}</p>
+                        <p><strong>Fee:</strong> ₹${event.fee}</p>
+                        <p><strong>Enrolled:</strong> ${enrolledCount}/${event.max_participants}</p>
+                        <p>${event.description}</p>
+                        ${canEnroll ? `<button class="btn btn-success" onclick="enrollEvent('${event.id}', ${event.fee})">Enroll</button>` : ''}
+                        ${isEnrolled ? `<button class="btn" onclick="unenrollEvent('${event.id}')">Unenroll</button>` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function enrollEvent(eventId, fee) {
+            if (!currentUserProfile) {
+                showError('Please login to enroll');
+                return;
+            }
+
+            try {
+                const paymentStatus = fee > 0 ? 'pending' : 'free';
+                const qrData = {
+                    event_id: eventId,
+                    user_id: currentUserProfile.id,
+                    timestamp: new Date().toISOString()
+                };
+
+                const { error } = await supabase
+                    .from('enrollments')
+                    .insert([{
+                        event_id: eventId,
+                        user_id: currentUserProfile.id,
+                        payment_status: paymentStatus,
+                        amount: fee,
+                        qr_code_data: qrData
+                    }]);
+
+                if (error) throw error;
+
+                await logActivity('Student enrolled', `Enrolled in event`);
+                showSuccess('Enrolled successfully!');
+                loadEvents();
+                loadEnrolledEvents();
+            } catch (error) {
+                showError(error.message);
+            }
+        }
+
+        async function unenrollEvent(eventId) {
+            try {
+                const { error } = await supabase
+                    .from('enrollments')
+                    .delete()
+                    .eq('event_id', eventId)
+                    .eq('user_id', currentUserProfile.id);
+
+                if (error) throw error;
+
+                showSuccess('Unenrolled successfully!');
+                loadEvents();
+                loadEnrolledEvents();
+            } catch (error) {
+                showError(error.message);
+            }
+        }
+
+        async function loadEnrolledEvents() {
+            if (!currentUserProfile) return;
+
+            const { data: enrollments, error } = await supabase
+                .from('enrollments')
+                .select(`
+                    *,
+                    events (*)
+                `)
+                .eq('user_id', currentUserProfile.id);
+
+            const list = document.getElementById('enrolledEventsList');
+            if (!enrollments || enrollments.length === 0) {
+                list.innerHTML = '<p style="text-align: center; color: #666;">No enrolled events.</p>';
+                return;
+            }
+
+            list.innerHTML = enrollments.map(enrollment => {
+                const event = enrollment.events;
+                return `
+                    <div class="event-card">
+                        ${event.poster_url ? `<img src="${event.poster_url}" class="event-poster" alt="${event.title}">` : ''}
+                        <h3>${event.title}</h3>
+                        <p><strong>Date:</strong> ${new Date(event.date).toLocaleDateString()}</p>
+                        <p><strong>Location:</strong> ${event.location}</p>
+                        <p><strong>Status:</strong> ${enrollment.payment_status}</p>
+                        <div id="qr-${enrollment.id}" style="margin: 15px auto; width: 200px;"></div>
+                    </div>
+                `;
+            }).join('');
+
+            // Generate QR codes
+            enrollments.forEach(enrollment => {
+                const qrDiv = document.getElementById(`qr-${enrollment.id}`);
+                if (qrDiv && enrollment.qr_code_data) {
+                    new QRCode(qrDiv, {
+                        text: JSON.stringify(enrollment.qr_code_data),
+                        width: 200,
+                        height: 200
+                    });
+                }
+            });
+        }
+
+        async function addEvent() {
+            if (!currentUserProfile || (currentUserProfile.user_type !== 'secretary' && currentUserProfile.user_type !== 'management')) {
+                showError('Unauthorized');
+                return;
+            }
+
+            const title = document.getElementById('eventTitle').value;
+            const date = document.getElementById('eventDate').value;
+            const description = document.getElementById('eventDescription').value;
+            const location = document.getElementById('eventLocation').value;
+            const maxParticipants = document.getElementById('eventMaxParticipants').value;
+            const fee = document.getElementById('eventFee').value;
+            const posterFile = document.getElementById('eventPoster').files[0];
+
+            if (!title || !date || !location) {
+                showError('Please fill required fields');
+                return;
+            }
+
+            try {
+                let posterUrl = null;
+
+                // Upload poster if provided
+                if (posterFile) {
+                    const fileExt = posterFile.name.split('.').pop();
+                    const fileName = `${Math.random()}.${fileExt}`;
+                    const { data: uploadData, error: uploadError } = await supabase.storage
+                        .from('event-posters')
+                        .upload(fileName, posterFile);
+
+                    if (uploadError) throw uploadError;
+
+                    const { data: urlData } = supabase.storage
+                        .from('event-posters')
+                        .getPublicUrl(fileName);
+                    
+                    posterUrl = urlData.publicUrl;
+                }
+
+                const { error } = await supabase
+                    .from('events')
+                    .insert([{
+                        title,
+                        date,
+                        description,
+                        location,
+                        max_participants: maxParticipants,
+                        fee,
+                        poster_url: posterUrl,
+                        created_by: currentUserProfile.id,
+                        budget: fee * maxParticipants
+                    }]);
+
+                if (error) throw error;
+
+                await logActivity('Event created', `Created event: ${title}`);
+                hideModal('addEventModal');
+                showSuccess('Event added successfully!');
+                loadEvents();
+                
+                // Clear form
+                document.getElementById('eventTitle').value = '';
+                document.getElementById('eventDate').value = '';
+                document.getElementById('eventDescription').value = '';
+                document.getElementById('eventLocation').value = '';
+                document.getElementById('eventMaxParticipants').value = '100';
+                document.getElementById('eventFee').value = '0';
+                document.getElementById('eventPoster').value = '';
+            } catch (error) {
+                showError(error.message);
+            }
+        }
+
+        // Gallery
+        async function loadGallery() {
+            const { data: photos, error } = await supabase
+                .from('gallery_photos')
+                .select(`
+                    *,
+                    profiles (username)
+                `)
+                .order('uploaded_at', { ascending: false });
+
+            const list = document.getElementById('galleryList');
+            if (!photos || photos.length === 0) {
+                list.innerHTML = '<p style="text-align: center; color: #666;">No photos yet.</p>';
+                return;
+            }
+
+            list.innerHTML = photos.map(photo => `
+                <div class="event-card">
+                    <img src="${photo.image_url}" class="event-poster" alt="${photo.title}">
+                    <h3>${photo.title}</h3>
+                    <p>${photo.description}</p>
+                    <p style="color: #999; font-size: 14px;">By: ${photo.profiles?.username || 'Unknown'}</p>
+                </div>
+            `).join('');
+        }
+
+        // Feedback
+        async function loadFeedback() {
+            const { data: feedbacks, error } = await supabase
+                .from('feedback')
+                .select(`
+                    *,
+                    profiles (username)
+                `)
+                .order('created_at', { ascending: false });
+
+            const list = document.getElementById('feedbackList');
+            if (!feedbacks || feedbacks.length === 0) {
+                list.innerHTML = '<p style="text-align: center; color: #666;">No feedback yet.</p>';
+                return;
+            }
+
+            list.innerHTML = feedbacks.map(fb => `
+                <div class="event-card">
+                    <p><strong>${fb.profiles?.username || fb.author_name || 'Anonymous'}</strong></p>
+                    <p>${fb.text}</p>
+                    <p style="color: #999; font-size: 12px;">${new Date(fb.created_at).toLocaleDateString()}</p>
+                </div>
+            `).join('');
+        }
+
+        async function submitFeedback() {
+            const text = document.getElementById('feedbackText').value;
+            if (!text) {
+                showError('Please enter feedback');
+                return;
+            }
+
+            try {
+                const { error } = await supabase
+                    .from('feedback')
+                    .insert([{
+                        author_id: currentUserProfile?.id,
+                        author_name: currentUser || 'Anonymous',
+                        text
+                    }]);
+
+                if (error) throw error;
+
+                document.getElementById('feedbackText').value = '';
+                showSuccess('Feedback submitted!');
+                loadFeedback();
+            } catch (error) {
+                showError(error.message);
+            }
+        }
+
+        // Utilities
+        async function logActivity(action, details) {
+            try {
+                await supabase.from('activity_log').insert([{
+                    action,
+                    details,
+                    user_id: currentUserProfile?.id
+                }]);
+            } catch (error) {
+                console.error('Error logging activity:', error);
+            }
+        }
+
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
+            document.getElementById(tabName)?.classList.remove('hidden');
+            
+            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                if (tab.textContent.toLowerCase().includes(tabName)) {
+                    tab.classList.add('active');
+                }
+            });
+
+            if (tabName === 'enrolled') loadEnrolledEvents();
+        }
+
+        function showModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+        }
+
+        function hideModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function showLogin() {
+            hideModal('signupModal');
+            showModal('loginModal');
+        }
+
+        function showSignup() {
+            hideModal('loginModal');
+            showModal('signupModal');
+        }
+
+        function showAddEventModal() {
+            if (!currentUserProfile || (currentUserProfile.user_type !== 'secretary' && currentUserProfile.user_type !== 'management')) {
+                showError('Unauthorized');
+                return;
+            }
+            showModal('addEventModal');
+        }
+
+        function showError(message) {
+            alert('Error: ' + message);
+        }
+
+        function showSuccess(message) {
+            alert(message);
+        }
+
+        // Close modals on outside click
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
